@@ -28,19 +28,18 @@ try {
       break;
 
     case 'post':
-        if ($argc != 8) {
-          throw new Exception("Использование: php index.php post <name> <description> <url> <attr1> <attr2>\n");
-     }
-     list( , , $name, $description, $sourceUrl, $attr1, $attr2 ) = array_slice($argv, 2);
-     $response = $apiClient->addSource(
-            trim($name),
-            trim($description),
-            trim($sourceUrl),
-            trim($attr1),
-            trim($attr2)
-        );
-     print_r($response);
-     break;
+      if ($argc != 7) {
+        throw new Exception("Использование: php index.php post <name> <description> <url> <attr1> <attr2>\n");
+      }
+      $name = $argv[2];
+      $description = $argv[3];
+      $sourceUrl = $argv[4];
+      $attr1 = $argv[5];
+      $attr2 = $argv[6];
+
+      $response = $apiClient->addSource($name, $description, $sourceUrl, $attr1, $attr2);
+      echo "Ресурс успешно добавлен с id {$response['id']}";
+      break;
 
     case 'delete':
       if ($argc != 3) {
@@ -56,7 +55,7 @@ try {
       }
       $sources = $apiClient->getSources(1);
       $lastpage = $sources["view"]["last"];
-     $parts = parse_url($lastpage);
+      $parts = parse_url($lastpage);
       if (isset($parts['query'])) {
         parse_str($parts['query'], $queryParams);
         $page = $queryParams['page'] ?? null;
