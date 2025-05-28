@@ -38,7 +38,7 @@ try {
       $attr2 = $argv[6];
 
       $response = $apiClient->addSource($name, $description, $sourceUrl, $attr1, $attr2);
-      echo "Ресурс успешно добавлен с id {$response['id']}";
+      echo "Ресурс успешно добавлен с id {$response['id']}\n";
       break;
 
     case 'delete':
