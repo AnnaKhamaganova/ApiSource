@@ -1,6 +1,6 @@
 <?php
 
-require_once 'C:\programming\ApiTest\SourseApi.php';
+require_once 'SourseApi.php';
 
 $apiUrl = "http://6d21d1646ba0.vps.myjino.ru/api/sources";
 
