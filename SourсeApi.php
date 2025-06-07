@@ -43,8 +43,38 @@ class SourceApi {
         );
     }
 
+    /* Обновить источник по ID */
+    public function updateSourse(int $id, array $data): array {
+         if (empty($id)) {
+            throw new Exception("Не указан ID");
+        }
+
+        // Список допустимых ключей
+        $allowedKeys = ['name', 'description', 'url', 'attr1', 'attr2'];
+
+        // Предположим, что пользователь прислал массив ключей (например, из формы или API)
+        $userKeys = array_keys($data); // или другой массив ключей
+
+        // Проверяем, что все введённые ключи входят в список допустимых
+        $invalidKeys = array_diff($userKeys, $allowedKeys);
+
+        if (!empty($invalidKeys)) {
+            throw new Exception("Введен неизвестый ключ: ". implode(', ', $invalidKeys));
+        }
+
+        $urlSourse = "{$this->baseUrl}/$id";
+
+        return json_decode(
+            $this->sendRequest($urlSourse, 'PATCH', json_encode($data)),
+            true
+        );
+    }
+
     /* Удалить источник по ID */
     public function deleteSource(int $id): string {
+        if (empty($id)) {
+            throw new Exception("Не указан ID");
+        }
         $url = "{$this->baseUrl}/$id";
 
         return $this->sendRequest($url, 'DELETE');
@@ -62,6 +92,12 @@ class SourceApi {
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
                 }
                 break;
+            case 'PATCH':
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
+                if ($body !== null) {
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+                }
+                break;
             case 'DELETE':
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
                 break;
@@ -73,11 +109,19 @@ class SourceApi {
         }
 
         // Заголовки
-        if ($method === 'POST' || !empty($body)) {
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Accept: application/ld+json',
-                'Content-Type: application/ld+json; charset=utf-8',
-            ]);
+        if (!empty($body)) {
+            if ($method === 'POST') {
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    'Accept: application/ld+json',
+                    'Content-Type: application/ld+json; charset=utf-8',
+                ]);
+            }
+            if ($method === 'PATCH') {
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    'Accept: application/ld+json',
+                    'Content-Type: application/merge-patch+json; charset=utf-8',
+                ]);
+            }
         }
 
         // Выполнение запроса

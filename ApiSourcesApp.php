@@ -1,6 +1,6 @@
 <?php
 
-require_once 'SourseApi.php';
+require_once 'SourсeApi.php';
 
 $apiUrl = "http://6d21d1646ba0.vps.myjino.ru/api/sources";
 
@@ -41,6 +41,22 @@ try {
       echo "Ресурс успешно добавлен с id {$response['id']}\n";
       break;
 
+    case 'update':
+      if ($argc < 4 || $argc > 7) {
+        throw new Exception("Использование: php index.php update <id> <key>=<value>, ... (Допустимые ключи: name, description, url, attr1, attr2)\n");
+      }
+      $id = $argv[2];
+      $params = [];
+      foreach ($argv as $index => $arg) {
+        if ($index < 3) continue; // пропускаем имя скрипта
+        list($key, $value) = explode('=', $arg, 2);
+        $params[strtolower($key)] = $value;
+      }
+
+      $response = $apiClient->updateSourse($id, $params);
+      echo "Ресурс успешно обновлен";
+      break;
+
     case 'delete':
       if ($argc != 3) {
         throw new Exception("Использование: php index.php delete <id>\n");
@@ -68,6 +84,7 @@ try {
       echo "Доступные команды:\n";
       echo " - get <page>\n";
       echo " - post <name> <description> <url> <attr1> <attr2>\n";
+      echo " - update <id> <key>=<value>, ... (Допустимые ключи: name, description, url, attr1, attr2)\n";
       echo " - delete <id>\n";
       echo " - pages\n";
       break;
